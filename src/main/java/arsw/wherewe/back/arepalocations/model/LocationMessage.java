@@ -18,7 +18,7 @@ public class LocationMessage {
         this.timestamp = Instant.now().toEpochMilli();
     }
 
-    public LocationMessage(String userId, double latitude, double longitude, String groupId, String placeName) {
+    public LocationMessage(String userId, double latitude, double longitude, String groupId) {
         this.userId = userId;
         this.latitude = latitude;
         this.longitude = longitude;
