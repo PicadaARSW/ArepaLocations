@@ -2,3 +2,7 @@ server:
   address: 0.0.0.0
   port: 8086
 
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://WhereWe:2sYYfVUbywluKzLC@wherewe-locations.cvofwjm.mongodb.net/WhereWe-locations?retryWrites=true&w=majority&appName=WhereWe-locations
