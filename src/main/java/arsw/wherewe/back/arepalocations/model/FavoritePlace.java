@@ -2,16 +2,25 @@ package arsw.wherewe.back.arepalocations.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Document(collection = "locations")
+@Schema(description = "Favorite place entity representing a saved location for a group")
 public class FavoritePlace {
     @Id
+    @Schema(description = "Unique identifier of the favorite place", example = "507f1f77bcf86cd799439011")
     private String id;
+    @Schema(description = "Name of the favorite place", example = "Central Park")
     private String placeName;
+    @Schema(description = "Latitude coordinate of the place", example = "40.785091")
     private double latitude;
+    @Schema(description = "Longitude coordinate of the place", example = "-73.968285")
     private double longitude;
+    @Schema(description = "ID of the group associated with this place", example = "group123")
     private String groupId;
+    @Schema(description = "Radius around the place in meters", example = "100.0")
     private float radius; // in meters
+    @Schema(description = "Timestamp when the place was created or updated", example = "1696118400000")
     private long timestamp;
 
     // Constructors

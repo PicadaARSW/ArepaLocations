@@ -5,4 +5,10 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://WhereWe:2sYYfVUbywluKzLC@wherewe-locations.cvofwjm.mongodb.net/WhereWe-locations?retryWrites=true&w=majority&appName=WhereWe-locations
+      uri: ${MONGODB_URI}
+
+springdoc:
+  swagger-ui:
+    path: /api-locations.html
+  api-docs:
+    path: /api-locations
