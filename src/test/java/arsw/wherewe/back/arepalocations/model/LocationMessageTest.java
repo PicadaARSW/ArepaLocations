@@ -3,9 +3,8 @@ package arsw.wherewe.back.arepalocations.model;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LocationMessageTest {
+class LocationMessageTest {
 
     @Test
     void constructor_withParameters_initializesFields() {

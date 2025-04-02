@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class LocationControllerTest {
+class LocationControllerTest {
 
     // Constants for test data
     private static final String GROUP_ID = "group123";
