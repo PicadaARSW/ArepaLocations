@@ -2,15 +2,25 @@ package arsw.wherewe.back.arepalocations.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LocationMessageTest {
 
     @Test
     void constructor_initializesTimestamp() {
+        // Arrange: Create a new FavoritePlace object
         LocationMessage locationMessage = new LocationMessage();
-        assertNotNull(locationMessage.getTimestamp());
+
+        // Act: Get the timestamp
+        long timestamp = locationMessage.getTimestamp();
+
+        // Assert: Verify that the timestamp is not zero and is close to the current time
+        assertNotEquals(0L, timestamp, "Timestamp should not be zero");
+        long currentTime = System.currentTimeMillis();
+        long timeDifference = currentTime - timestamp;
+        assertTrue(timeDifference >= 0 && timeDifference < 1000,
+                "Timestamp should be close to the current time (within 1 second)");
     }
 
     @Test
@@ -21,7 +31,11 @@ public class LocationMessageTest {
         assertEquals(-73.968285, locationMessage.getLongitude());
         assertEquals("group123", locationMessage.getGroupId());
         assertEquals("active", locationMessage.getStatus());
-        assertNotNull(locationMessage.getTimestamp());
+        assertNotNull(locationMessage.getTimestamp(), "Timestamp should not be null");
+        long currentTime = System.currentTimeMillis();
+        long timeDifference = currentTime - locationMessage.getTimestamp();
+        assertTrue(timeDifference >= 0 && timeDifference < 1000,
+                "Timestamp should be close to the current time (within 1 second)");
     }
 
     @Test
