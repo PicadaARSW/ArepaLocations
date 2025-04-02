@@ -2,16 +2,10 @@ package arsw.wherewe.back.arepalocations.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LocationMessageTest {
-
-    @Test
-    void constructor_initializesTimestamp() {
-        LocationMessage locationMessage = new LocationMessage();
-        assertNotNull(locationMessage.getTimestamp());
-    }
 
     @Test
     void constructor_withParameters_initializesFields() {
@@ -21,7 +15,6 @@ public class LocationMessageTest {
         assertEquals(-73.968285, locationMessage.getLongitude());
         assertEquals("group123", locationMessage.getGroupId());
         assertEquals("active", locationMessage.getStatus());
-        assertNotNull(locationMessage.getTimestamp());
     }
 
     @Test

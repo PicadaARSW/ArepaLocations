@@ -1,0 +1,17 @@
+name: SonarCloud Analysis
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  sonarcloud:
+    uses: ZayraGS1403/central-pipelines/.github/workflows/sonarcloud-analysis.yml@v0.1.1
+    with:
+      java-version: '21'
+      branch-name: ${{ GitHub.head_ref}}
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+      SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY}}
