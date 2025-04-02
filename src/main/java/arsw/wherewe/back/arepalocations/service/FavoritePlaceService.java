@@ -10,8 +10,15 @@ import java.util.List;
 @Service
 public class FavoritePlaceService {
 
-    @Autowired
     private FavoritePlaceRepository favoritePlaceRepository;
+
+    /**
+     * Constructor for FavoritePlaceService injecting FavoritePlaceRepository
+     */
+    @Autowired
+    public FavoritePlaceService(FavoritePlaceRepository favoritePlaceRepository) {
+        this.favoritePlaceRepository = favoritePlaceRepository;
+    }
 
 
     public void deleteFavoritePlace(String id){
