@@ -7,7 +7,7 @@ on:
 
 jobs:
   sonarcloud:
-    uses: ZayraGS1403/central-pipelines/.github/workflows/sonarcloud-analysis.yml@v0.1.1
+    uses: ZayraGS1403/central-pipelines/.github/workflows/sonarcloud-analysis.yml@v0.1.2
     with:
       java-version: '21'
       branch-name: ${{ GitHub.head_ref}}
