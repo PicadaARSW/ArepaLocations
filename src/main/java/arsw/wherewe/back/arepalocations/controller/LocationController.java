@@ -38,7 +38,6 @@ public class LocationController {
     @Autowired
     private NotificationService notificationService;
 
-    private FavoritePlaceService favoritePlaceService;
 
     /**
      * Constructor for LocationController injecting SimpMessagingTemplate
@@ -54,67 +53,13 @@ public class LocationController {
     @MessageMapping("/location") // Este es el punto de entrada para los mensajes STOMP
     @Operation(summary = "Send location via WebSocket (STOMP)", description = "Sends a user's location to a group via WebSocket. This endpoint is not directly testable in Swagger as it uses STOMP over WebSocket. Clients should connect to '/ws' and send messages to '/app/location'. The message will be broadcast to '/topic/location/{groupId}'.")
     public void sendLocation(LocationMessage location) {
-
         // Enviar el mensaje a todos los suscriptores del grupo
-
         System.out.println("Ubicación recibida: " + location.getUserId() + ": " + location.getStatus() +
                 " en (" + location.getLatitude() + ", " + location.getLongitude() + ")");
-
         // Enviar la actualización de ubicación a los suscriptores vía STOMP
-
         simpMessagingTemplate.convertAndSend("/topic/location/" + location.getGroupId(), location);
-
         // Delegar la lógica de proximidad y notificaciones al servicio
         notificationService.checkFavoritePlaceProximity(location);
-    }
-
-    @MessageMapping("/addFavoritePlace")
-    public void addFavoritePlace(FavoritePlace location) {
-        System.out.println("Favorite place received: " + location.getPlaceName() + ": " +
-                " at (" + location.getLatitude() + ", " + location.getLongitude() + ") for group " + location.getGroupId());
-
-        // Save to MongoDB
-        FavoritePlace savedPlace = favoritePlaceService.saveFavoritePlace(location);
-
-        simpMessagingTemplate.convertAndSend("/topic/favoritePlace/" + location.getGroupId(), location);
-    }
-
-    @MessageMapping("/editFavoritePlace")
-    public void editFavoritePlace(FavoritePlace location) {
-        System.out.println("Editing favorite place: " + location.getPlaceName() + ": " +
-                " at (" + location.getLatitude() + ", " + location.getLongitude() + ") for group " + location.getGroupId());
-
-        FavoritePlace editedPlace = favoritePlaceService.editFavoritePlace(location);
-        simpMessagingTemplate.convertAndSend("/topic/favoritePlaceEdited/" + location.getGroupId(), editedPlace);
-    }
-
-    @MessageMapping("/deleteFavoritePlace")
-    public void deleteFavoritePlace(FavoritePlace location) {
-        System.out.println("Deleting favorite place: " + location.getId() + " for group " + location.getGroupId());
-
-        favoritePlaceService.deleteFavoritePlace(location.getId());
-        simpMessagingTemplate.convertAndSend("/topic/favoritePlaceDeleted/" + location.getGroupId(), location);
-    }
-
-    @GetMapping("/api/v1/favoritePlaces/{groupId}")
-    public ResponseEntity<List<FavoritePlace>> getFavoritePlacesByGroupId(@PathVariable("groupId") String groupId) {
-        List<FavoritePlace> favoritePlaces = favoritePlaceService.getFavoritePlacesByGroupId(groupId);
-        if(favoritePlaces.isEmpty()){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(favoritePlaces);
-    }
-
-    @PutMapping("/api/v1/favoritePlaces")
-    public ResponseEntity<FavoritePlace> editFavoritePlacee(FavoritePlace favoritePlace) {
-        FavoritePlace editedFavoritePlace = favoritePlaceService.editFavoritePlace(favoritePlace);
-        return ResponseEntity.ok(editedFavoritePlace);
-    }
-
-    @DeleteMapping("/api/v1/favoritePlaces/{id}")
-    public ResponseEntity<?> deleteFavoritePlace(@PathVariable("id") String id) {
-        favoritePlaceService.deleteFavoritePlace(id);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/api/v1/users/push-token")
