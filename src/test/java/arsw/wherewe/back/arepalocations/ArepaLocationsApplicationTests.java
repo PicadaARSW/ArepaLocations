@@ -8,6 +8,7 @@ class ArepaLocationsApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// this is empty because it is not necessary
 	}
 
 }
