@@ -2,7 +2,10 @@ package arsw.wherewe.back.arepalocations.controller;
 
 import arsw.wherewe.back.arepalocations.model.FavoritePlace;
 import arsw.wherewe.back.arepalocations.model.LocationMessage;
+import arsw.wherewe.back.arepalocations.model.PushToken;
+import arsw.wherewe.back.arepalocations.repository.PushTokenRepository;
 import arsw.wherewe.back.arepalocations.service.FavoritePlaceService;
+import arsw.wherewe.back.arepalocations.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,18 +19,23 @@ public class LocationController {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
-
     @Autowired
     private FavoritePlaceService favoritePlaceService;
+    @Autowired
+    private PushTokenRepository pushTokenRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     @MessageMapping("/location") // Este es el punto de entrada para los mensajes STOMP
     public void sendLocation(LocationMessage location) {
-        // Imprimir un mensaje de conexión para verificar que está llegando
-        System.out.println("Location received: " + location.getUserId() + ": " + location.getStatus() +
-                " at (" + location.getLatitude() + ", " + location.getLongitude() + ")");
+        System.out.println("Ubicación recibida: " + location.getUserId() + ": " + location.getStatus() +
+                " en (" + location.getLatitude() + ", " + location.getLongitude() + ")");
 
-        // Enviar el mensaje a todos los suscriptores del grupo
+        // Enviar la actualización de ubicación a los suscriptores vía STOMP
         simpMessagingTemplate.convertAndSend("/topic/location/" + location.getGroupId(), location);
+
+        // Delegar la lógica de proximidad y notificaciones al servicio
+        notificationService.checkFavoritePlaceProximity(location);
     }
 
     @MessageMapping("/addFavoritePlace")
@@ -79,4 +87,9 @@ public class LocationController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/api/v1/users/push-token")
+    public ResponseEntity<?> savePushToken(@RequestBody PushToken pushToken) {
+        pushTokenRepository.save(pushToken);
+        return ResponseEntity.ok().build();
+    }
 }
