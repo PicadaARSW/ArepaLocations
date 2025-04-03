@@ -21,6 +21,7 @@ public class FavoritePlaceService {
     }
 
 
+
     public void deleteFavoritePlace(String id){
         favoritePlaceRepository.deleteById(id);
     }

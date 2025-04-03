@@ -12,3 +12,4 @@ springdoc:
     path: /api-locations.html
   api-docs:
     path: /api-locations
+
