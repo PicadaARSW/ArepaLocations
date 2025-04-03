@@ -21,6 +21,7 @@ public class FavoritePlace {
     @Schema(description = "Radius around the place in meters", example = "100.0")
     private float radius; // in meters
     @Schema(description = "Timestamp when the place was created or updated", example = "1696118400000")
+
     private long timestamp;
 
     // Constructors
