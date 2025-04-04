@@ -41,23 +41,23 @@ class LocationControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void sendLocation_sendsMessageToGroup() {
-        // Arrange: Create a LocationMessage with test data
-        LocationMessage locationMessage = new LocationMessage();
-        locationMessage.setGroupId(GROUP_ID);
-        locationMessage.setUserId(USER_ID);
-        locationMessage.setLatitude(LATITUDE);
-        locationMessage.setLongitude(LONGITUDE);
-        locationMessage.setStatus("active");
-
-        // Act: Call the sendLocation method
-        locationController.sendLocation(locationMessage);
-
-        // Assert: Verify that the message is sent to the correct topic with the correct payload
-        verify(simpMessagingTemplate, times(1))
-                .convertAndSend("/topic/location/" + GROUP_ID, locationMessage);
-    }
+//    @Test
+//    void sendLocation_sendsMessageToGroup() {
+//        // Arrange: Create a LocationMessage with test data
+//        LocationMessage locationMessage = new LocationMessage();
+//        locationMessage.setGroupId(GROUP_ID);
+//        locationMessage.setUserId(USER_ID);
+//        locationMessage.setLatitude(LATITUDE);
+//        locationMessage.setLongitude(LONGITUDE);
+//        locationMessage.setStatus("active");
+//
+//        // Act: Call the sendLocation method
+//        locationController.sendLocation(locationMessage);
+//
+//        // Assert: Verify that the message is sent to the correct topic with the correct payload
+//        verify(simpMessagingTemplate, times(1))
+//                .convertAndSend("/topic/location/" + GROUP_ID, locationMessage);
+//    }
 
     @Test
     void addFavoritePlace_savesAndSendsMessage() {

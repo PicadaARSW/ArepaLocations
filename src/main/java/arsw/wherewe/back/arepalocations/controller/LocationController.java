@@ -2,6 +2,7 @@ package arsw.wherewe.back.arepalocations.controller;
 
 import arsw.wherewe.back.arepalocations.model.FavoritePlace;
 import arsw.wherewe.back.arepalocations.model.LocationMessage;
+
 import arsw.wherewe.back.arepalocations.service.FavoritePlaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,7 +10,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import arsw.wherewe.back.arepalocations.model.PushToken;
+import arsw.wherewe.back.arepalocations.repository.PushTokenRepository;
+import arsw.wherewe.back.arepalocations.service.FavoritePlaceService;
+import arsw.wherewe.back.arepalocations.service.NotificationService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -18,12 +26,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+
 @Tag(name = "Locations", description = "API for managing locations and favorite places, including WebSocket-based location sharing")
+
 public class LocationController {
 
     private SimpMessagingTemplate simpMessagingTemplate;
-
+    @Autowired
     private FavoritePlaceService favoritePlaceService;
+    @Autowired
+    private PushTokenRepository pushTokenRepository;
+    @Autowired
+    private NotificationService notificationService;
+
 
     /**
      * Constructor for LocationController injecting SimpMessagingTemplate
@@ -40,7 +55,28 @@ public class LocationController {
     @Operation(summary = "Send location via WebSocket (STOMP)", description = "Sends a user's location to a group via WebSocket. This endpoint is not directly testable in Swagger as it uses STOMP over WebSocket. Clients should connect to '/ws' and send messages to '/app/location'. The message will be broadcast to '/topic/location/{groupId}'.")
     public void sendLocation(LocationMessage location) {
         // Enviar el mensaje a todos los suscriptores del grupo
+        System.out.println("Ubicación recibida: " + location.getUserId() + ": " + location.getStatus() +
+                " en (" + location.getLatitude() + ", " + location.getLongitude() + ")");
+        // Enviar la actualización de ubicación a los suscriptores vía STOMP
         simpMessagingTemplate.convertAndSend("/topic/location/" + location.getGroupId(), location);
+        // Delegar la lógica de proximidad y notificaciones al servicio
+        notificationService.checkFavoritePlaceProximity(location);
+    }
+
+    @PostMapping("/api/v1/users/push-token")
+    public ResponseEntity<?> savePushToken(@RequestBody PushToken pushToken) {
+        try {
+            System.out.println("Guardando token push: " + pushToken.getToken() + " para usuario " + pushToken.getUserId() + " en grupo " + pushToken.getGroupId());
+            // Elimina el token existente para este userId
+            pushTokenRepository.deleteByUserId(pushToken.getUserId());
+            // Guarda el nuevo token
+            PushToken savedToken = pushTokenRepository.save(pushToken);
+            System.out.println("Token guardado en la base de datos: " + savedToken.getToken());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.err.println("Error al guardar el token push: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar el token push");
+        }
     }
 
     @MessageMapping("/addFavoritePlace")
