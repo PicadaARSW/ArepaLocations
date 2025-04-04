@@ -17,6 +17,7 @@ import arsw.wherewe.back.arepalocations.service.FavoritePlaceService;
 import arsw.wherewe.back.arepalocations.service.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -64,8 +65,18 @@ public class LocationController {
 
     @PostMapping("/api/v1/users/push-token")
     public ResponseEntity<?> savePushToken(@RequestBody PushToken pushToken) {
-        pushTokenRepository.save(pushToken);
-        return ResponseEntity.ok().build();
+        try {
+            System.out.println("Guardando token push: " + pushToken.getToken() + " para usuario " + pushToken.getUserId() + " en grupo " + pushToken.getGroupId());
+            // Elimina el token existente para este userId
+            pushTokenRepository.deleteByUserId(pushToken.getUserId());
+            // Guarda el nuevo token
+            PushToken savedToken = pushTokenRepository.save(pushToken);
+            System.out.println("Token guardado en la base de datos: " + savedToken.getToken());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.err.println("Error al guardar el token push: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar el token push");
+        }
     }
 
     @MessageMapping("/addFavoritePlace")

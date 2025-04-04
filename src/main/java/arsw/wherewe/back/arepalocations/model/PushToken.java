@@ -1,7 +1,9 @@
 package arsw.wherewe.back.arepalocations.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "push_tokens")
 public class PushToken {
@@ -9,6 +11,8 @@ public class PushToken {
     private String id;
     private String userId;
     private String groupId;
+    @Field("pushToken")
+    @JsonProperty("pushToken")
     private String token;
 
     public PushToken() {}
