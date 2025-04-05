@@ -1,45 +1,46 @@
-package arsw.wherewe.back.arepalocations.model;
+package arsw.wherewe.back.arepalocations.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Document(collection = "locations")
-@Schema(description = "Favorite place entity representing a saved location for a group")
-public class FavoritePlace {
-    @Id
+@Schema(description = "DTO representing a favorite place for a group")
+public class FavoritePlaceDTO {
     @Schema(description = "Unique identifier of the favorite place", example = "507f1f77bcf86cd799439011")
     private String id;
+
     @Schema(description = "Name of the favorite place", example = "Central Park")
     private String placeName;
+
     @Schema(description = "Latitude coordinate of the place", example = "40.785091")
     private double latitude;
+
     @Schema(description = "Longitude coordinate of the place", example = "-73.968285")
     private double longitude;
+
     @Schema(description = "ID of the group associated with this place", example = "group123")
     private String groupId;
-    @Schema(description = "Radius around the place in meters", example = "100.0")
-    private float radius; // in meters
-    @Schema(description = "Timestamp when the place was created or updated", example = "1696118400000")
 
+    @Schema(description = "Radius around the place in meters", example = "100.0")
+    private float radius;
+
+    @Schema(description = "Timestamp when the place was created or updated", example = "1696118400000")
     private long timestamp;
 
     // Constructors
-    public FavoritePlace() {
+    public FavoritePlaceDTO() {
         this.timestamp = System.currentTimeMillis();
     }
 
-    public FavoritePlace(String placeName, double latitude, double longitude, String groupId, float radius) {
+    public FavoritePlaceDTO(String id, String placeName, double latitude, double longitude, String groupId, float radius, long timestamp) {
+        this.id = id;
         this.placeName = placeName;
         this.latitude = latitude;
         this.longitude = longitude;
         this.groupId = groupId;
         this.radius = radius;
-        this.timestamp = System.currentTimeMillis();
+        this.timestamp = timestamp;
     }
 
     // Getters and Setters
-
     public String getId() {
         return id;
     }
@@ -98,7 +99,7 @@ public class FavoritePlace {
 
     @Override
     public String toString() {
-        return "FavoritePlace{" +
+        return "FavoritePlaceDTO{" +
                 "id='" + id + '\'' +
                 ", placeName='" + placeName + '\'' +
                 ", latitude=" + latitude +
