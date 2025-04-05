@@ -131,7 +131,7 @@ public class NotificationService {
                     conn.getResponseCode();
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    //
                 }
             }
         }
