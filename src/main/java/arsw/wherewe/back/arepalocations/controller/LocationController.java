@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import arsw.wherewe.back.arepalocations.model.PushToken;
 import arsw.wherewe.back.arepalocations.service.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
