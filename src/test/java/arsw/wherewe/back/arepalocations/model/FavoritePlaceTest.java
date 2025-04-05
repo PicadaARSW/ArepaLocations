@@ -2,10 +2,20 @@ package arsw.wherewe.back.arepalocations.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FavoritePlaceTest {
 
+
+    @Test
+    void constructor_withParameters_initializesFields() {
+        FavoritePlace favoritePlace = new FavoritePlace("Central Park", 40.785091, -73.968285, "group123", 100.0f);
+        assertEquals("Central Park", favoritePlace.getPlaceName());
+        assertEquals(40.785091, favoritePlace.getLatitude());
+        assertEquals(-73.968285, favoritePlace.getLongitude());
+        assertEquals("group123", favoritePlace.getGroupId());
+        assertEquals(100.0f, favoritePlace.getRadius());
+    }
 
     @Test
     void setters_updateFields() {
