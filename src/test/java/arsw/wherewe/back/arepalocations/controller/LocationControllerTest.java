@@ -1,8 +1,9 @@
 package arsw.wherewe.back.arepalocations.controller;
 
-import arsw.wherewe.back.arepalocations.model.FavoritePlace;
-import arsw.wherewe.back.arepalocations.model.LocationMessage;
+import arsw.wherewe.back.arepalocations.dto.FavoritePlaceDTO;
+import arsw.wherewe.back.arepalocations.dto.PushTokenDTO;
 import arsw.wherewe.back.arepalocations.service.FavoritePlaceService;
+import arsw.wherewe.back.arepalocations.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,6 +34,9 @@ class LocationControllerTest {
     @Mock
     private FavoritePlaceService favoritePlaceService;
 
+    @Mock
+    private NotificationService notificationService;
+
     @InjectMocks
     private LocationController locationController;
 
@@ -41,99 +45,66 @@ class LocationControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-//    @Test
-//    void sendLocation_sendsMessageToGroup() {
-//        // Arrange: Create a LocationMessage with test data
-//        LocationMessage locationMessage = new LocationMessage();
-//        locationMessage.setGroupId(GROUP_ID);
-//        locationMessage.setUserId(USER_ID);
-//        locationMessage.setLatitude(LATITUDE);
-//        locationMessage.setLongitude(LONGITUDE);
-//        locationMessage.setStatus("active");
-//
-//        // Act: Call the sendLocation method
-//        locationController.sendLocation(locationMessage);
-//
-//        // Assert: Verify that the message is sent to the correct topic with the correct payload
-//        verify(simpMessagingTemplate, times(1))
-//                .convertAndSend("/topic/location/" + GROUP_ID, locationMessage);
-//    }
-
     @Test
     void addFavoritePlace_savesAndSendsMessage() {
-        // Arrange: Create a FavoritePlace with test data
-        FavoritePlace favoritePlace = new FavoritePlace();
-        favoritePlace.setGroupId(GROUP_ID);
-        favoritePlace.setPlaceName("Central Park");
-        favoritePlace.setLatitude(LATITUDE);
-        favoritePlace.setLongitude(LONGITUDE);
-        favoritePlace.setRadius(100.0f);
+        FavoritePlaceDTO favoritePlaceDTO = new FavoritePlaceDTO();
+        favoritePlaceDTO.setGroupId(GROUP_ID);
+        favoritePlaceDTO.setPlaceName("Central Park");
+        favoritePlaceDTO.setLatitude(LATITUDE);
+        favoritePlaceDTO.setLongitude(LONGITUDE);
+        favoritePlaceDTO.setRadius(100.0f);
 
-        // Mock the service to return the saved place
-        when(favoritePlaceService.saveFavoritePlace(any(FavoritePlace.class))).thenReturn(favoritePlace);
+        when(favoritePlaceService.saveFavoritePlace(any(FavoritePlaceDTO.class))).thenReturn(favoritePlaceDTO);
 
-        // Act: Call the addFavoritePlace method
-        locationController.addFavoritePlace(favoritePlace);
+        locationController.addFavoritePlace(favoritePlaceDTO);
 
-        // Assert: Verify that the place is saved and the message is sent
-        verify(favoritePlaceService, times(1)).saveFavoritePlace(favoritePlace);
+        verify(favoritePlaceService, times(1)).saveFavoritePlace(favoritePlaceDTO);
         verify(simpMessagingTemplate, times(1))
-                .convertAndSend("/topic/favoritePlace/" + GROUP_ID, favoritePlace);
+                .convertAndSend("/topic/favoritePlace/" + GROUP_ID, favoritePlaceDTO);
     }
 
     @Test
     void editFavoritePlace_editsAndSendsMessage() {
-        // Arrange: Create a FavoritePlace with test data
-        FavoritePlace favoritePlace = new FavoritePlace();
-        favoritePlace.setId(PLACE_ID);
-        favoritePlace.setGroupId(GROUP_ID);
-        favoritePlace.setPlaceName("Updated Park");
-        favoritePlace.setLatitude(LATITUDE);
-        favoritePlace.setLongitude(LONGITUDE);
+        FavoritePlaceDTO favoritePlaceDTO = new FavoritePlaceDTO();
+        favoritePlaceDTO.setId(PLACE_ID);
+        favoritePlaceDTO.setGroupId(GROUP_ID);
+        favoritePlaceDTO.setPlaceName("Updated Park");
+        favoritePlaceDTO.setLatitude(LATITUDE);
+        favoritePlaceDTO.setLongitude(LONGITUDE);
 
-        // Mock the service to return the edited place
-        when(favoritePlaceService.editFavoritePlace(any(FavoritePlace.class))).thenReturn(favoritePlace);
+        when(favoritePlaceService.editFavoritePlace(any(FavoritePlaceDTO.class))).thenReturn(favoritePlaceDTO);
 
-        // Act: Call the editFavoritePlace method
-        locationController.editFavoritePlace(favoritePlace);
+        locationController.editFavoritePlace(favoritePlaceDTO);
 
-        // Assert: Verify that the place is edited and the message is sent
-        verify(favoritePlaceService, times(1)).editFavoritePlace(favoritePlace);
+        verify(favoritePlaceService, times(1)).editFavoritePlace(favoritePlaceDTO);
         verify(simpMessagingTemplate, times(1))
-                .convertAndSend("/topic/favoritePlaceEdited/" + GROUP_ID, favoritePlace);
+                .convertAndSend("/topic/favoritePlaceEdited/" + GROUP_ID, favoritePlaceDTO);
     }
 
     @Test
     void deleteFavoritePlace_deletesAndSendsMessage() {
-        // Arrange: Create a FavoritePlace with test data
-        FavoritePlace favoritePlace = new FavoritePlace();
-        favoritePlace.setId(PLACE_ID);
-        favoritePlace.setGroupId(GROUP_ID);
+        FavoritePlaceDTO favoritePlaceDTO = new FavoritePlaceDTO();
+        favoritePlaceDTO.setId(PLACE_ID);
+        favoritePlaceDTO.setGroupId(GROUP_ID);
 
-        // Act: Call the deleteFavoritePlace method
-        locationController.deleteFavoritePlace(favoritePlace);
+        locationController.deleteFavoritePlace(favoritePlaceDTO);
 
-        // Assert: Verify that the place is deleted and the message is sent
         verify(favoritePlaceService, times(1)).deleteFavoritePlace(PLACE_ID);
         verify(simpMessagingTemplate, times(1))
-                .convertAndSend("/topic/favoritePlaceDeleted/" + GROUP_ID, favoritePlace);
+                .convertAndSend("/topic/favoritePlaceDeleted/" + GROUP_ID, favoritePlaceDTO);
     }
 
     @Test
     void getFavoritePlacesByGroupId_returnsFavoritePlaces() {
-        // Arrange: Create a list of FavoritePlace objects
-        FavoritePlace favoritePlace = new FavoritePlace();
-        favoritePlace.setId(PLACE_ID);
-        favoritePlace.setGroupId(GROUP_ID);
-        List<FavoritePlace> favoritePlaces = List.of(favoritePlace);
+        FavoritePlaceDTO favoritePlaceDTO = new FavoritePlaceDTO();
+        favoritePlaceDTO.setId(PLACE_ID);
+        favoritePlaceDTO.setGroupId(GROUP_ID);
+        List<FavoritePlaceDTO> favoritePlaces = List.of(favoritePlaceDTO);
 
-        // Mock the service to return the list
         when(favoritePlaceService.getFavoritePlacesByGroupId(GROUP_ID)).thenReturn(favoritePlaces);
 
-        // Act: Call the getFavoritePlacesByGroupId method
-        ResponseEntity<List<FavoritePlace>> response = locationController.getFavoritePlacesByGroupId(GROUP_ID);
+        ResponseEntity<List<FavoritePlaceDTO>> response = locationController.getFavoritePlacesByGroupId(GROUP_ID);
 
-        // Assert: Verify the response status and body
         assertEquals(200, response.getStatusCode().value());
         assertEquals(favoritePlaces, response.getBody());
         assertNotNull(response.getBody());
@@ -143,74 +114,91 @@ class LocationControllerTest {
 
     @Test
     void getFavoritePlacesByGroupId_returnsNoContentWhenEmpty() {
-        // Arrange: Mock the service to return an empty list
         when(favoritePlaceService.getFavoritePlacesByGroupId(GROUP_ID)).thenReturn(Collections.emptyList());
 
-        // Act: Call the getFavoritePlacesByGroupId method
-        ResponseEntity<List<FavoritePlace>> response = locationController.getFavoritePlacesByGroupId(GROUP_ID);
+        ResponseEntity<List<FavoritePlaceDTO>> response = locationController.getFavoritePlacesByGroupId(GROUP_ID);
 
-        // Assert: Verify the response status is 204 (No Content)
         assertEquals(204, response.getStatusCode().value());
         assertNull(response.getBody());
     }
 
     @Test
     void editFavoritePlacee_editsFavoritePlaceSuccessfully() {
-        // Arrange: Create a FavoritePlace with test data
-        FavoritePlace favoritePlace = new FavoritePlace();
-        favoritePlace.setId(PLACE_ID);
-        favoritePlace.setGroupId(GROUP_ID);
-        favoritePlace.setPlaceName("Updated Park");
+        FavoritePlaceDTO favoritePlaceDTO = new FavoritePlaceDTO();
+        favoritePlaceDTO.setId(PLACE_ID);
+        favoritePlaceDTO.setGroupId(GROUP_ID);
+        favoritePlaceDTO.setPlaceName("Updated Park");
 
-        // Mock the service to return the edited place
-        when(favoritePlaceService.editFavoritePlace(any(FavoritePlace.class))).thenReturn(favoritePlace);
+        when(favoritePlaceService.editFavoritePlace(any(FavoritePlaceDTO.class))).thenReturn(favoritePlaceDTO);
 
-        // Act: Call the editFavoritePlacee method
-        ResponseEntity<FavoritePlace> response = locationController.editFavoritePlacee(favoritePlace);
+        ResponseEntity<FavoritePlaceDTO> response = locationController.editFavoritePlacee(favoritePlaceDTO);
 
-        // Assert: Verify the response status and body
         assertEquals(200, response.getStatusCode().value());
-        assertEquals(favoritePlace, response.getBody());
+        assertEquals(favoritePlaceDTO, response.getBody());
         assertNotNull(response.getBody());
         assertEquals(PLACE_ID, response.getBody().getId());
-        verify(favoritePlaceService, times(1)).editFavoritePlace(favoritePlace);
+        verify(favoritePlaceService, times(1)).editFavoritePlace(favoritePlaceDTO);
     }
 
     @Test
     void editFavoritePlacee_returnsNotFoundWhenPlaceDoesNotExist() {
-        // Arrange: Mock the service to throw an exception (simulating a not-found scenario)
-        FavoritePlace favoritePlace = new FavoritePlace();
-        favoritePlace.setId(PLACE_ID);
-        when(favoritePlaceService.editFavoritePlace(any(FavoritePlace.class)))
+        FavoritePlaceDTO favoritePlaceDTO = new FavoritePlaceDTO();
+        favoritePlaceDTO.setId(PLACE_ID);
+        when(favoritePlaceService.editFavoritePlace(any(FavoritePlaceDTO.class)))
                 .thenThrow(new IllegalArgumentException("Favorite place not found"));
 
-        // Act & Assert: Verify that the exception is thrown
         assertThrows(IllegalArgumentException.class, () -> {
-            locationController.editFavoritePlacee(favoritePlace);
+            locationController.editFavoritePlacee(favoritePlaceDTO);
         });
-        verify(favoritePlaceService, times(1)).editFavoritePlace(favoritePlace);
+        verify(favoritePlaceService, times(1)).editFavoritePlace(favoritePlaceDTO);
     }
 
     @Test
     void deleteFavoritePlace_deletesFavoritePlaceSuccessfully() {
-        // Act: Call the deleteFavoritePlace method
         ResponseEntity<Void> response = locationController.deleteFavoritePlace(PLACE_ID);
 
-        // Assert: Verify the response status and service interaction
         assertEquals(200, response.getStatusCode().value());
         verify(favoritePlaceService, times(1)).deleteFavoritePlace(PLACE_ID);
     }
 
     @Test
     void deleteFavoritePlace_returnsNotFoundWhenPlaceDoesNotExist() {
-        // Arrange: Mock the service to throw an exception (simulating a not-found scenario)
         doThrow(new IllegalArgumentException("Favorite place not found"))
                 .when(favoritePlaceService).deleteFavoritePlace(PLACE_ID);
 
-        // Act & Assert: Verify that the exception is thrown
         assertThrows(IllegalArgumentException.class, () -> {
             locationController.deleteFavoritePlace(PLACE_ID);
         });
         verify(favoritePlaceService, times(1)).deleteFavoritePlace(PLACE_ID);
+    }
+
+    @Test
+    void savePushToken_savesSuccessfully() {
+        PushTokenDTO pushTokenDTO = new PushTokenDTO();
+        pushTokenDTO.setUserId(USER_ID);
+        pushTokenDTO.setGroupId(GROUP_ID);
+        pushTokenDTO.setToken("token123");
+
+        ResponseEntity<String> response = locationController.savePushToken(pushTokenDTO);
+
+        assertEquals(200, response.getStatusCode().value());
+        verify(notificationService, times(1)).deletePushToken(USER_ID);
+        verify(notificationService, times(1)).savePushToken(pushTokenDTO);
+    }
+
+    @Test
+    void savePushToken_handlesException() {
+        PushTokenDTO pushTokenDTO = new PushTokenDTO();
+        pushTokenDTO.setUserId(USER_ID);
+        pushTokenDTO.setGroupId(GROUP_ID);
+        pushTokenDTO.setToken("token123");
+
+        doThrow(new RuntimeException("Error saving token")).when(notificationService).deletePushToken(USER_ID);
+
+        ResponseEntity<String> response = locationController.savePushToken(pushTokenDTO);
+
+        assertEquals(500, response.getStatusCode().value());
+        assertEquals("Error al guardar el token push", response.getBody());
+        verify(notificationService, times(1)).deletePushToken(USER_ID);
     }
 }

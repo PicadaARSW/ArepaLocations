@@ -1,5 +1,6 @@
 package arsw.wherewe.back.arepalocations.service;
 
+import arsw.wherewe.back.arepalocations.dto.FavoritePlaceDTO;
 import arsw.wherewe.back.arepalocations.model.FavoritePlace;
 import arsw.wherewe.back.arepalocations.repository.FavoritePlaceRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,13 +30,14 @@ class FavoritePlaceServiceTest {
 
     @Test
     void saveFavoritePlace_savesAndReturnsFavoritePlace() {
+        FavoritePlaceDTO favoritePlaceDTO = new FavoritePlaceDTO();
         FavoritePlace favoritePlace = new FavoritePlace();
         when(favoritePlaceRepository.save(any(FavoritePlace.class))).thenReturn(favoritePlace);
 
-        FavoritePlace result = favoritePlaceService.saveFavoritePlace(favoritePlace);
+        FavoritePlaceDTO result = favoritePlaceService.saveFavoritePlace(favoritePlaceDTO);
 
-        assertEquals(favoritePlace, result);
-        verify(favoritePlaceRepository, times(1)).save(favoritePlace);
+        assertEquals(favoritePlace.getId(), result.getId());
+        verify(favoritePlaceRepository, times(1)).save(any(FavoritePlace.class));
     }
 
     @Test
@@ -52,20 +54,21 @@ class FavoritePlaceServiceTest {
         List<FavoritePlace> favoritePlaces = List.of(new FavoritePlace());
         when(favoritePlaceRepository.findByGroupId("group1")).thenReturn(favoritePlaces);
 
-        List<FavoritePlace> result = favoritePlaceService.getFavoritePlacesByGroupId("group1");
+        List<FavoritePlaceDTO> result = favoritePlaceService.getFavoritePlacesByGroupId("group1");
 
-        assertEquals(favoritePlaces, result);
+        assertEquals(favoritePlaces.size(), result.size());
         verify(favoritePlaceRepository, times(1)).findByGroupId("group1");
     }
 
     @Test
     void editFavoritePlace_editsAndReturnsFavoritePlace() {
+        FavoritePlaceDTO favoritePlaceDTO = new FavoritePlaceDTO();
         FavoritePlace favoritePlace = new FavoritePlace();
         when(favoritePlaceRepository.save(any(FavoritePlace.class))).thenReturn(favoritePlace);
 
-        FavoritePlace result = favoritePlaceService.editFavoritePlace(favoritePlace);
+        FavoritePlaceDTO result = favoritePlaceService.editFavoritePlace(favoritePlaceDTO);
 
-        assertEquals(favoritePlace, result);
-        verify(favoritePlaceRepository, times(1)).save(favoritePlace);
+        assertEquals(favoritePlace.getId(), result.getId());
+        verify(favoritePlaceRepository, times(1)).save(any(FavoritePlace.class));
     }
 }
