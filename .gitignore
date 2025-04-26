@@ -33,7 +33,7 @@ build/
 ### VS Code ###
 .vscode/
 .env
-
+.idea/
 ### Ignorar archivos específicos de configuración ###
 src/main/java/arsw/wherewe/back/arepalocations/config/FirebaseConfig.java
 src/main/java/arsw/wherewe/back/arepalocations/config/DotEnvConfig.java
