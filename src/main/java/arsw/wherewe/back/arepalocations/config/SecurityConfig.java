@@ -15,7 +15,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para WebSocket
                 .authorizeHttpRequests(authorize -> authorize
                         // Permitir acceso sin autenticación a WebSocket y Swagger
                         .requestMatchers("/ws/**", "/api-locations/**", "/swagger-ui/**").permitAll()
