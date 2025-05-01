@@ -127,14 +127,14 @@ public class LocationController {
     })
     public ResponseEntity<String> savePushToken(@RequestBody PushTokenDTO pushToken) {
         try {
-            // Elimina el token existente para este userId
+            System.out.println("Guardando token para userId: " + pushToken.getUserId() + ", token: " + pushToken.getToken());
             notificationService.deletePushToken(pushToken.getUserId());
-            // Guarda el nuevo token
             notificationService.savePushToken(pushToken);
+            System.out.println("Token guardado exitosamente");
             return ResponseEntity.ok().build();
         } catch (Exception e) {
+            System.err.println("Error al guardar el token push: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar el token push");
         }
     }
-
 }

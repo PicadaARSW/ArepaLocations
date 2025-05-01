@@ -33,8 +33,7 @@ public class NotificationService {
         this.pushTokenRepository = pushTokenRepository;
         this.favoritePlaceService = favoritePlaceService;
     }
-
-    // Map PushTokenDTO to PushToken
+    
     private PushToken toPushToken(PushTokenDTO pushTokenDTO) {
         PushToken pushToken = new PushToken(
                 pushTokenDTO.getUserId(),
@@ -108,24 +107,25 @@ public class NotificationService {
     private void sendNotification(String groupId, String userId, FavoritePlaceDTO place, String action) {
         List<PushToken> tokens = pushTokenRepository.findByGroupId(groupId);
         String userName = getUserName(userId);
-        String messageBody = String.format("%s acaba de %s %s", userName, action, place.getPlaceName());
-
+        String messageBodyOthers = String.format("%s acaba de %s %s", userName, action, place.getPlaceName());
+        String messageBodySelf = String.format("Has %s %s", action.equals("entrar a") ? "entrado a" : "salido de", place.getPlaceName());
+        System.out.println("Intentando enviar notificación a " + tokens.size() + " usuarios en el grupo " + groupId);
         for (PushToken token : tokens) {
-            if (!token.getUserId().equals(userId)) {
-                try {
-                    Message message = Message.builder()
-                            .setNotification(Notification.builder()
-                                    .setTitle("Movimiento en el grupo")
-                                    .setBody(messageBody)
-                                    .build())
-                            .setToken(token.getToken())
-                            .putData("sound", "default")
-                            .build();
-                    FirebaseMessaging.getInstance().send(message);
-                    System.out.println("Notificación enviada a: " + token.getToken());
-                } catch (Exception e) {
-                    System.err.println("Error enviando notificación a " + token.getToken() + ": " + e.getMessage());
-                }
+            try {
+                String messageBody = token.getUserId().equals(userId) ? messageBodySelf : messageBodyOthers;
+                Message message = Message.builder()
+                        .setNotification(Notification.builder()
+                                .setTitle("Movimiento en el grupo")
+                                .setBody(messageBody)
+                                .build())
+                        .setToken(token.getToken())
+                        .putData("sound", "default")
+                        .build();
+                String response = FirebaseMessaging.getInstance().send(message);
+                System.out.println("Notificación enviada a: " + token.getToken() + ", Respuesta: " + response);
+            } catch (Exception e) {
+                System.err.println("Error enviando notificación a " + token.getToken() + ": " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
