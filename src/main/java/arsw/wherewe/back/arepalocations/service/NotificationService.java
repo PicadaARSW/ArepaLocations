@@ -11,10 +11,6 @@ import com.google.firebase.messaging.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +105,6 @@ public class NotificationService {
         String userName = getUserName(userId);
         String messageBodyOthers = String.format("%s acaba de %s %s", userName, action, place.getPlaceName());
         String messageBodySelf = String.format("Has %s %s", action.equals("entrar a") ? "entrado a" : "salido de", place.getPlaceName());
-        System.out.println("Intentando enviar notificación a " + tokens.size() + " usuarios en el grupo " + groupId);
         for (PushToken token : tokens) {
             try {
                 String messageBody = token.getUserId().equals(userId) ? messageBodySelf : messageBodyOthers;
@@ -121,11 +116,9 @@ public class NotificationService {
                         .setToken(token.getToken())
                         .putData("sound", "default")
                         .build();
-                String response = FirebaseMessaging.getInstance().send(message);
-                System.out.println("Notificación enviada a: " + token.getToken() + ", Respuesta: " + response);
+                FirebaseMessaging.getInstance().send(message);
             } catch (Exception e) {
-                System.err.println("Error enviando notificación a " + token.getToken() + ": " + e.getMessage());
-                e.printStackTrace();
+                // Handle the exception (e.g., log it)
             }
         }
     }
