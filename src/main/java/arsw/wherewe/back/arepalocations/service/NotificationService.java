@@ -5,13 +5,12 @@ import arsw.wherewe.back.arepalocations.dto.PushTokenDTO;
 import arsw.wherewe.back.arepalocations.model.LocationMessage;
 import arsw.wherewe.back.arepalocations.model.PushToken;
 import arsw.wherewe.back.arepalocations.repository.PushTokenRepository;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +29,7 @@ public class NotificationService {
         this.pushTokenRepository = pushTokenRepository;
         this.favoritePlaceService = favoritePlaceService;
     }
-
-    // Map PushTokenDTO to PushToken
+    
     private PushToken toPushToken(PushTokenDTO pushTokenDTO) {
         PushToken pushToken = new PushToken(
                 pushTokenDTO.getUserId(),
@@ -105,34 +103,22 @@ public class NotificationService {
     private void sendNotification(String groupId, String userId, FavoritePlaceDTO place, String action) {
         List<PushToken> tokens = pushTokenRepository.findByGroupId(groupId);
         String userName = getUserName(userId);
-
-        String messageBody = String.format("%s acaba de %s %s", userName, action, place.getPlaceName());
-
+        String messageBodyOthers = String.format("%s acaba de %s %s", userName, action, place.getPlaceName());
+        String messageBodySelf = String.format("Has %s %s", action.equals("entrar a") ? "entrado a" : "salido de", place.getPlaceName());
         for (PushToken token : tokens) {
-            if (!token.getUserId().equals(userId)) {
-                try {
-                    URI uri = URI.create("https://exp.host/--/api/v2/push/send");
-                    HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setRequestProperty("Accept", "application/json");
-                    conn.setDoOutput(true);
-
-                    String payload = String.format(
-                            "{\"to\": \"%s\", \"title\": \"Movimiento en el grupo\", \"body\": \"%s\", \"sound\": \"default\"}",
-                            token.getToken(), messageBody
-                    );
-
-                    try (OutputStream os = conn.getOutputStream()) {
-                        byte[] input = payload.getBytes(StandardCharsets.UTF_8);
-                        os.write(input, 0, input.length);
-                    }
-
-                    conn.getResponseCode();
-
-                } catch (Exception e) {
-                    //
-                }
+            try {
+                String messageBody = token.getUserId().equals(userId) ? messageBodySelf : messageBodyOthers;
+                Message message = Message.builder()
+                        .setNotification(Notification.builder()
+                                .setTitle("Movimiento en el grupo")
+                                .setBody(messageBody)
+                                .build())
+                        .setToken(token.getToken())
+                        .putData("sound", "default")
+                        .build();
+                FirebaseMessaging.getInstance().send(message);
+            } catch (Exception e) {
+                // Handle the exception (e.g., log it)
             }
         }
     }
